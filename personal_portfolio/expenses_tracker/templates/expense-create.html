@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_content %}
+
+    <h1>Create Expense</h1>
+    <!-- Create Expense Form -->
+    <div class="form">
+        <form method="post" action="{% url 'expense create' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <!-- Create Button -->
+            <input type="submit" value="Create">
+        </form>
+    </div>
+    <!-- End Create Expense Form -->
+
+{% endblock %}
