@@ -1,17 +1,20 @@
 from django.core.validators import MinLengthValidator, MinValueValidator
 from django.db import models
 
-from personal_portfolio.validators import validate_only_chars, validate_maximum_file_size
+from personal_portfolio.expenses_tracker.validators import validate_only_chars, MaxFileSizeInMBValidator
 
 
 class Profile(models.Model):
 
     FIRST_NAME_MIN_LENGTH = 2
-    LAST_NAME_MIN_LENGTH = 2
     FIRST_NAME_MAX_LENGTH = 15
+
+    LAST_NAME_MIN_LENGTH = 2
     LAST_NAME_MAX_LENGTH = 15
 
     BUDGET_MIN_VALUE = 0
+
+    MAX_FILE_SIZE_IN_MB = 5
 
     budget = models.FloatField(
         default=BUDGET_MIN_VALUE,
@@ -44,10 +47,12 @@ class Profile(models.Model):
         blank=True,
         null=True,
         validators=[
-            validate_maximum_file_size
+            MaxFileSizeInMBValidator(MAX_FILE_SIZE_IN_MB)
         ]
     )
 
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
 
 class Expense(models.Model):
 

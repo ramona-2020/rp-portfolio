@@ -1,4 +1,4 @@
-{% extends 'base.html' %}\
+{% extends 'base/base.html' %}\
 {% load static %}
 
 {% block page_content %}
@@ -6,7 +6,7 @@
   <h1>Enter your data</h1>
     <!-- Profile Create Form -->
     <div class="form">
-        <form method="post" action="{% url 'homepage' %}" enctype="multipart/form-data">
+        <form method="post" action="{% url 'create profile' %}" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form }}
 

@@ -11,31 +11,26 @@ def get_profile():
 
 
 def homepage(request):
-    has_profile = Profile.objects.count()
-    form = CreateProfileForm(request.POST, request.FILES)
+    profile = get_profile()
+    if not profile:
+        return redirect('create profile')
 
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-    elif has_profile == 0:
-        form = CreateProfileForm()
-        context = {
-            'form': form
-        }
-        return render(request, 'home-no-profile.html', context)
-
-    profile = Profile.objects.first()
-    profile_expenses = Expense.objects.filter(profile=profile).all()
-
-    total_expenses = sum(expense.price for expense in profile_expenses)
-    budget_left = profile.budget - total_expenses
-
-    context = {
-        'profile': profile,
-        'budget_left': budget_left,
-        'profile_expenses': profile_expenses,
-    }
-    return render(request, 'home-with-profile.html', context)
+    # if request.method == 'POST':
+    #     form = CreateProfileForm(request.POST, request.FILES)
+    #     if form.is_valid():
+    #         form.save()
+    #
+    # profile_expenses = Expense.objects.filter(profile=profile).all()
+    #
+    # total_expenses = sum(expense.price for expense in profile_expenses)
+    # budget_left = profile.budget - total_expenses
+    #
+    # context = {
+    #     'profile': profile,
+    #     'budget_left': budget_left,
+    #     'profile_expenses': profile_expenses,
+    # }
+    return render(request, 'home-with-profile.html')
 
 
 def profile(request):
@@ -45,12 +40,6 @@ def profile(request):
     total_expenses = sum(expense.price for expense in profile_expenses)
     budget_left = profile.budget - total_expenses
 
-    form = CreateProfileForm(request.POST, request.FILES)
-
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-
     context = {
         'profile': profile,
         'budget_left': budget_left,
@@ -58,6 +47,21 @@ def profile(request):
     }
 
     return render(request, 'profile.html', context)
+
+
+def create_profile(request):
+    if request.method == 'POST':
+        form = CreateProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('homepage')
+    else:
+        form = CreateProfileForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'home-no-profile.html', context)
 
 
 def profile_edit(request):

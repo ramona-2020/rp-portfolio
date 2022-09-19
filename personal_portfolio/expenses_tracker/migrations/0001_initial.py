@@ -2,7 +2,7 @@
 
 import django.core.validators
 from django.db import migrations, models
-import personal_portfolio.validators
+import personal_portfolio.expenses_tracker.validators
 
 
 class Migration(migrations.Migration):
@@ -27,10 +27,10 @@ class Migration(migrations.Migration):
             name='Profile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('first_name', models.CharField(max_length=15, validators=[django.core.validators.MinLengthValidator(2), personal_portfolio.validators.validate_only_chars], verbose_name='First Name')),
-                ('last_name', models.CharField(max_length=15, validators=[django.core.validators.MinLengthValidator(2), personal_portfolio.validators.validate_only_chars], verbose_name='Last Name')),
+                ('first_name', models.CharField(max_length=15, validators=[django.core.validators.MinLengthValidator(2), personal_portfolio.expenses_tracker.validators.validate_only_chars], verbose_name='First Name')),
+                ('last_name', models.CharField(max_length=15, validators=[django.core.validators.MinLengthValidator(2), personal_portfolio.expenses_tracker.validators.validate_only_chars], verbose_name='Last Name')),
                 ('budget', models.FloatField(default=0, validators=[django.core.validators.MinValueValidator(0)])),
-                ('image', models.ImageField(blank=True, default='images/user.png', null=True, upload_to='images/', validators=[personal_portfolio.validators.validate_maximum_file_size], verbose_name='Profile Image')),
+                ('image', models.ImageField(blank=True, default='images/user.png', null=True, upload_to='images/', verbose_name='Profile Image')),
             ],
         ),
     ]
