@@ -1,7 +1,6 @@
-from django.http import Http404
 from django.shortcuts import render, redirect
 
-from personal_portfolio.expenses_tracker.forms.profile_form import CreateProfileForm, DeleteProfileForm
+from personal_portfolio.expenses_tracker.forms.profile_form import CreateProfileForm, EditProfileForm, DeleteProfileForm
 from personal_portfolio.expenses_tracker.forms.expense_form import ExpenseForm, DeleteExpenseForm
 from personal_portfolio.expenses_tracker.models import Profile, Expense
 
@@ -15,25 +14,6 @@ def homepage(request):
     if not profile:
         return redirect('create profile')
 
-    # if request.method == 'POST':
-    #     form = CreateProfileForm(request.POST, request.FILES)
-    #     if form.is_valid():
-    #         form.save()
-    #
-    # profile_expenses = Expense.objects.filter(profile=profile).all()
-    #
-    # total_expenses = sum(expense.price for expense in profile_expenses)
-    # budget_left = profile.budget - total_expenses
-    #
-    # context = {
-    #     'profile': profile,
-    #     'budget_left': budget_left,
-    #     'profile_expenses': profile_expenses,
-    # }
-    return render(request, 'home-with-profile.html')
-
-
-def profile(request):
     profile = Profile.objects.first()
     profile_expenses = Expense.objects.filter(profile=profile)
 
@@ -42,8 +22,29 @@ def profile(request):
 
     context = {
         'profile': profile,
-        'budget_left': budget_left,
         'profile_expenses': profile_expenses,
+        'budget_left': budget_left,
+    }
+    return render(request, 'home-with-profile.html', context)
+
+
+def show_profile(request):
+    profile = Profile.objects.first()
+    if profile:
+        profile_expenses = Expense.objects.filter(profile=profile)
+
+        total_expenses = sum(expense.price for expense in profile_expenses)
+        budget_left = profile.budget - total_expenses
+
+        expenses_count = len(profile_expenses)
+
+    else:
+        return redirect(request, '404.html')
+
+    context = {
+        'profile': profile,
+        'budget_left': budget_left,
+        'expenses_count': expenses_count,
     }
 
     return render(request, 'profile.html', context)
@@ -60,6 +61,7 @@ def create_profile(request):
 
     context = {
         'form': form,
+        'no_profile': True,
     }
     return render(request, 'home-no-profile.html', context)
 
@@ -67,15 +69,16 @@ def create_profile(request):
 def profile_edit(request):
     profile = Profile.objects.first()
 
-    if profile is not None:
+    if profile:
         if request.method == 'POST':
-            form = CreateProfileForm(request.POST, request.FILES, instance=profile)
+            form = EditProfileForm(request.POST, request.FILES, instance=profile)
             if form.is_valid():
                 form.save()
+                return redirect('show profile')
         else:
-            form = CreateProfileForm(instance=profile)
+            form = EditProfileForm(instance=profile)
     else:
-        return Http404('Profile not found')
+        return redirect(request, '404.html')
 
     context = {
         'profile': profile,
@@ -87,19 +90,18 @@ def profile_edit(request):
 
 def profile_delete(request):
     profile = Profile.objects.first()
-    if request.method == 'POST':
-        profile.delete()
-
-        form = CreateProfileForm()
-        context = {
-            'form': form
-        }
-        return render(request, 'home-no-profile.html', context)
+    if profile:
+        if request.method == 'POST':
+            form = DeleteProfileForm(request.POST, request.FILES, instance=profile)
+            if form.is_valid():
+                form.save()
+            return redirect('homepage')
+        else:
+            form = DeleteProfileForm()
     else:
-        form = DeleteProfileForm()
+        return render(request, '404.html')
 
     context = {
-        'profile': profile,
         'form': form
     }
     return render(request, 'profile-delete.html', context)
